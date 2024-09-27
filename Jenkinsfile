@@ -1,6 +1,6 @@
 pipeline {
     agent any
-
+    
     stages {
         stage('Checkout SCM') {
             steps {
@@ -11,61 +11,69 @@ pipeline {
         stage('Check Python Version') {
             steps {
                 script {
-                    // Check for Python version
-                    sh 'python3 --version || python --version'
+                    // Capture and log the Python version
+                    def pythonVersion = sh(script: 'python3 --version', returnStdout: true).trim()
+                    echo "Python version: ${pythonVersion}"
                 }
             }
         }
-
+        
         stage('Create Virtual Environment') {
             steps {
                 script {
-                    // Create virtual environment
-                    sh 'python3 -m venv venv || python -m venv venv'
+                    // Create a virtual environment
+                    sh 'python3 -m venv venv'
                 }
             }
         }
-
+        
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Install dependencies
-                    sh 'pip install -r requirements.txt'
+                    // Activate the virtual environment and install dependencies
+                    sh '''
+                    source venv/bin/activate
+                    pip install -r requirements.txt
+                    '''
                 }
             }
         }
-
+        
         stage('Run Tests') {
             steps {
                 script {
-                    // Run tests
-                    sh 'pytest'
+                    // Run your test suite
+                    sh '''
+                    source venv/bin/activate
+                    pytest
+                    '''
                 }
             }
         }
-
+        
         stage('Build Artifacts') {
             steps {
                 script {
-                    // Build artifacts
-                    sh 'echo "Building artifacts..."'
+                    // Add your build commands here
+                    echo 'Building artifacts...'
                 }
             }
         }
-
+        
         stage('Deploy') {
             steps {
                 script {
-                    // Deploy application
-                    sh 'echo "Deploying..."'
+                    // Add your deployment commands here
+                    echo 'Deploying application...'
                 }
             }
         }
     }
-
+    
     post {
         always {
             echo 'Cleaning up...'
+            // Cleanup steps if needed
         }
         failure {
             echo 'Build failed. Deployment aborted.'
