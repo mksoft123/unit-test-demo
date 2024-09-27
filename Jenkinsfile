@@ -11,11 +11,11 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Activate virtual environment if needed
+                    // Activate the virtual environment
                     sh '''
-                    # If using a virtual environment, activate it here
-                    # source /path/to/venv/bin/activate
-                    pip install -r requirements.txt
+                    python3 -m venv venv  # Create a virtual environment
+                    source venv/bin/activate  # Activate it
+                    pip install -r requirements.txt  # Install dependencies
                     '''
                 }
             }
@@ -23,7 +23,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    def testResult = sh(script: 'pytest tests/', returnStatus: true)
+                    def testResult = sh(script: 'venv/bin/pytest tests/', returnStatus: true)
                     if (testResult != 0) {
                         currentBuild.result = 'FAILURE'
                         error("Tests failed with exit code: ${testResult}")
