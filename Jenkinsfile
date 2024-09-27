@@ -1,3 +1,4 @@
+echo 'maneesh'
 pipeline {
     agent any
 
