@@ -11,6 +11,7 @@ pipeline {
         stage('Check Python Version') {
             steps {
                 script {
+                    // Capture and log the Python version
                     def pythonVersion = sh(script: 'python3 --version', returnStdout: true).trim()
                     echo "Python version: ${pythonVersion}"
                 }
@@ -20,6 +21,7 @@ pipeline {
         stage('Create Virtual Environment') {
             steps {
                 script {
+                    // Create a virtual environment
                     sh 'python3 -m venv venv'
                 }
             }
@@ -28,9 +30,9 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
+                    // Activate the virtual environment and install dependencies
                     sh '''
                     source venv/bin/activate
-                    pip install --upgrade pip
                     pip install -r requirements.txt
                     '''
                 }
@@ -40,6 +42,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
+                    // Run your test suite
                     sh '''
                     source venv/bin/activate
                     pytest
@@ -51,6 +54,7 @@ pipeline {
         stage('Build Artifacts') {
             steps {
                 script {
+                    // Add your build commands here
                     echo 'Building artifacts...'
                 }
             }
@@ -59,6 +63,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
+                    // Add your deployment commands here
                     echo 'Deploying application...'
                 }
             }
@@ -68,19 +73,10 @@ pipeline {
     post {
         always {
             echo 'Cleaning up...'
-            sh 'rm -rf venv' // Optional: remove virtual environment
+            // Cleanup steps if needed
         }
         failure {
             echo 'Build failed. Deployment aborted.'
         }
-    }
-    
-    options {
-        disableConcurrentBuilds() // Optional: prevent concurrent builds
-    }
-    
-    // Optional: run this pipeline only on the master branch
-    when {
-        branch 'master'
     }
 }
