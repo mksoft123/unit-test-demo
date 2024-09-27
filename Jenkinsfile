@@ -1,25 +1,31 @@
-echo 'maneesh'
 pipeline {
     agent any
 
     stages {
         stage('Checkout') {
             steps {
+                echo 'Checking out the code...'
                 git 'https://github.com/mksoft123/unit-test-demo.git'
             }
         }
         stage('Install Dependencies') {
             steps {
-                sh 'pip install -r requirements.txt'
+                script {
+                    // Activate virtual environment if needed
+                    sh '''
+                    # If using a virtual environment, activate it here
+                    # source /path/to/venv/bin/activate
+                    pip install -r requirements.txt
+                    '''
+                }
             }
         }
         stage('Run Tests') {
             steps {
                 script {
-                    // Run pytest and capture the exit status
                     def testResult = sh(script: 'pytest tests/', returnStatus: true)
                     if (testResult != 0) {
-                        currentBuild.result = 'FAILURE' // Mark the build as failure
+                        currentBuild.result = 'FAILURE'
                         error("Tests failed with exit code: ${testResult}")
                     } else {
                         echo "Tests passed successfully!"
