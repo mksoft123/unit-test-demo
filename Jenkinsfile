@@ -11,7 +11,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Activate the virtual environment
+                    // Create and activate a virtual environment
                     sh '''
                     python3 -m venv venv  # Create a virtual environment
                     source venv/bin/activate  # Activate it
