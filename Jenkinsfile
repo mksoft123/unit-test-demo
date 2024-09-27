@@ -2,6 +2,11 @@ pipeline {
     agent any
 
     stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/mksoft123/unit-test-demo.git'
+            }
+        }
         stage('Install Dependencies') {
             steps {
                 sh 'pip install -r requirements.txt'
@@ -10,12 +15,11 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    // Run pytest and capture the result
-                    def result = sh(script: 'pytest tests/', returnStatus: true)
-                    // Check the exit code of pytest
-                    if (result != 0) {
-                        currentBuild.result = 'FAILURE' // Mark the build as failed
-                        error("Tests failed with exit code: ${result}") // Stop the pipeline
+                    // Run pytest and capture the exit status
+                    def testResult = sh(script: 'pytest tests/', returnStatus: true)
+                    if (testResult != 0) {
+                        currentBuild.result = 'FAILURE' // Mark the build as failure
+                        error("Tests failed with exit code: ${testResult}")
                     } else {
                         echo "Tests passed successfully!"
                     }
