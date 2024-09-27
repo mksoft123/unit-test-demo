@@ -8,32 +8,22 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                script {
-                    // Checkout code from GitHub
-                    git credentialsId: 'your-credentials-id', url: 'https://github.com/mksoft123/unit-test-demo.git'
-                }
-            }
-        }
-        
         stage('Install Dependencies') {
             steps {
                 sh 'pip install -r requirements.txt'
             }
         }
-
         stage('Run Tests') {
             steps {
                 script {
                     def result = sh(script: 'pytest tests/', returnStatus: true)
                     if (result != 0) {
-                        error("Tests failed with exit code: ${result}")
+                        currentBuild.result = 'FAILURE'  // Set build result to failure
+                        error("Tests failed with exit code: ${result}") // This will fail the stage
                     }
                 }
             }
         }
-
         stage('Build Artifacts') {
             steps {
                 // Example: Build Docker image or package application
@@ -41,7 +31,6 @@ pipeline {
                 // Add your build commands here (e.g., docker build)
             }
         }
-
         stage('Deploy') {
             steps {
                 script {
