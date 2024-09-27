@@ -2,45 +2,63 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage('Checkout SCM') {
             steps {
-                echo 'Checking out the code...'
-                git 'https://github.com/mksoft123/unit-test-demo.git'
+                checkout scm
             }
         }
+        
+        stage('Check Python Version') {
+            steps {
+                script {
+                    // Check for Python version
+                    sh 'python3 --version || python --version'
+                }
+            }
+        }
+
+        stage('Create Virtual Environment') {
+            steps {
+                script {
+                    // Create virtual environment
+                    sh 'python3 -m venv venv || python -m venv venv'
+                }
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Create and activate a virtual environment
-                    sh '''
-                    python -m venv venv  # Create a virtual environment
-                    source venv/bin/activate  # Activate it
-                    pip install -r requirements.txt  # Install dependencies
-                    '''
+                    // Install dependencies
+                    sh 'pip install -r requirements.txt'
                 }
             }
         }
+
         stage('Run Tests') {
             steps {
                 script {
-                    def testResult = sh(script: 'venv/bin/pytest tests/', returnStatus: true)
-                    if (testResult != 0) {
-                        currentBuild.result = 'FAILURE'
-                        error("Tests failed with exit code: ${testResult}")
-                    } else {
-                        echo "Tests passed successfully!"
-                    }
+                    // Run tests
+                    sh 'pytest'
                 }
             }
         }
+
         stage('Build Artifacts') {
             steps {
-                echo 'Building artifacts...'
+                script {
+                    // Build artifacts
+                    sh 'echo "Building artifacts..."'
+                }
             }
         }
+
         stage('Deploy') {
             steps {
-                echo "Deploying to environment..."
+                script {
+                    // Deploy application
+                    sh 'echo "Deploying..."'
+                }
             }
         }
     }
@@ -48,9 +66,6 @@ pipeline {
     post {
         always {
             echo 'Cleaning up...'
-        }
-        success {
-            echo 'Build succeeded. Ready for deployment.'
         }
         failure {
             echo 'Build failed. Deployment aborted.'
