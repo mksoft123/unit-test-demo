@@ -1,82 +1,45 @@
 pipeline {
     agent any
-    
     stages {
-        stage('Checkout SCM') {
+        stage('Checkout') {
             steps {
-                checkout scm
+                git 'https://github.com/mksoft123/unit-test-demo.git'
             }
         }
-        
-        stage('Check Python Version') {
+        stage('Test') {
             steps {
                 script {
-                    // Capture and log the Python version
-                    def pythonVersion = sh(script: 'python3 --version', returnStdout: true).trim()
-                    echo "Python version: ${pythonVersion}"
+                    def testResult = sh(script: 'python -m unittest discover tests', returnStatus: true)
+                    if (testResult != 0) {
+                        error 'Unit tests failed, aborting build.'
+                    }
                 }
             }
         }
-        
-        stage('Create Virtual Environment') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    // Create a virtual environment
-                    sh 'python3 -m venv venv'
+                    sh 'docker build -t my-python-app .'
                 }
             }
         }
-        
-        stage('Install Dependencies') {
+        stage('Run Docker Container') {
             steps {
                 script {
-                    // Activate the virtual environment and install dependencies
-                    sh '''
-                    source venv/bin/activate
-                    pip install -r requirements.txt
-                    '''
-                }
-            }
-        }
-        
-        stage('Run Tests') {
-            steps {
-                script {
-                    // Run your test suite
-                    sh '''
-                    source venv/bin/activate
-                    pytest
-                    '''
-                }
-            }
-        }
-        
-        stage('Build Artifacts') {
-            steps {
-                script {
-                    // Add your build commands here
-                    echo 'Building artifacts...'
-                }
-            }
-        }
-        
-        stage('Deploy') {
-            steps {
-                script {
-                    // Add your deployment commands here
-                    echo 'Deploying application...'
+                    sh 'docker run -d --name my-python-app -p 8080:8080 -v $(pwd)/data:/app/data my-python-app'
                 }
             }
         }
     }
-    
     post {
         always {
-            echo 'Cleaning up...'
-            // Cleanup steps if needed
+            cleanWs()
+        }
+        success {
+            echo 'Build and tests were successful!'
         }
         failure {
-            echo 'Build failed. Deployment aborted.'
+            echo 'Build failed, check logs for details.'
         }
     }
 }

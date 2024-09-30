@@ -7,9 +7,15 @@ from jwt import ExpiredSignatureError, InvalidTokenError  # Import specific exce
 from app.config import get_db
 from app.models import UserModel
 
+import os
+
+print("Mongo URI:", os.getenv("MONGO_URI"))
+exit()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback_secret_key')  # Use environment variable
 db = get_db()
+
+
 user_model = UserModel(db)
 
 # Token required decorator
@@ -52,8 +58,6 @@ def login():
     return jsonify({'message': 'Invalid credentials!'}), 401
 
 
-if __name__ == '__main__':
-    app.run(debug=True)  # Set to False in production
 
 
 @app.route('/users', methods=['POST'])
