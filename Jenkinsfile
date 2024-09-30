@@ -1,8 +1,6 @@
 pipeline {
-    agent {
-        docker { image 'python:3' }
-    }
-
+    agent any
+    
     stages {
         stage('Checkout SCM') {
             steps {
@@ -14,7 +12,7 @@ pipeline {
             steps {
                 script {
                     // Capture and log the Python version
-                    def pythonVersion = sh(script: 'python --version', returnStdout: true).trim()
+                    def pythonVersion = sh(script: 'python3 --version', returnStdout: true).trim()
                     echo "Python version: ${pythonVersion}"
                 }
             }
@@ -24,7 +22,7 @@ pipeline {
             steps {
                 script {
                     // Create a virtual environment
-                    sh 'python -m venv venv'
+                    sh 'python3 -m venv venv'
                 }
             }
         }
@@ -67,15 +65,6 @@ pipeline {
                 script {
                     // Add your deployment commands here
                     echo 'Deploying application...'
-                }
-            }
-        }
-        
-        stage('Test') {
-            steps {
-                script {
-                    // Test the pip version
-                    sh 'pip --version'
                 }
             }
         }
