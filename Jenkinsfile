@@ -1,21 +1,13 @@
 pipeline {
     agent any
+
     stages {
-        stage('Checkout') {
+        stage('Clone Repository') {
             steps {
                 git 'https://github.com/mksoft123/unit-test-demo.git'
             }
         }
-        stage('Test') {
-            steps {
-                script {
-                    def testResult = sh(script: 'python -m unittest discover tests', returnStatus: true)
-                    if (testResult != 0) {
-                        error 'Unit tests failed, aborting build.'
-                    }
-                }
-            }
-        }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -23,23 +15,32 @@ pipeline {
                 }
             }
         }
-        stage('Run Docker Container') {
+
+        stage('Run Tests') {
             steps {
                 script {
-                    sh 'docker run -d --name my-python-app -p 8080:8080 -v $(pwd)/data:/app/data my-python-app'
+                    // Run tests within the Docker container
+                    sh 'docker run --rm my-python-app pytest test/test_crud.py'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    // Run the application with Docker socket mounted
+                    sh 'docker run -d -p 8089:8080 -v /var/run/docker.sock:/var/run/docker.sock my-python-app'
                 }
             }
         }
     }
+
     post {
-        always {
-            cleanWs()
-        }
         success {
-            echo 'Build and tests were successful!'
+            echo 'Deployment successful!'
         }
         failure {
-            echo 'Build failed, check logs for details.'
+            echo 'Deployment failed!'
         }
     }
 }

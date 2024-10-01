@@ -15,7 +15,7 @@ def auth_token(client):
     # client.post('/users', data=json.dumps(user_data), content_type='application/json')
     
     # Now log in to get the token
-    login_data = {"username": "John", "password": "password123"}
+    login_data = {"username": "ravi", "password": "ravi"}
     response = client.post('/login', data=json.dumps(login_data), content_type='application/json')
     token = response.get_json().get('token')
     
@@ -24,7 +24,7 @@ def auth_token(client):
 # @pytest.mark.skip(reason="Skipping user creation test temporarily")
 
 def test_create_user(client):
-    user_data = {"username": "TeshtUser", "password": "testpuuassword"}
+    user_data = {"username": "ravi", "password": "ravi"}
     response = client.post('/users', data=json.dumps(user_data), content_type='application/json')
     assert response.status_code == 201
     assert 'user_id' in response.get_json()
@@ -33,7 +33,7 @@ def test_get_user(auth_token, client):
     headers = {'Authorization': f'Bearer {auth_token}'}
     
     # Create a user to retrieve
-    response = client.post('/users', data=json.dumps({"name": "Doe", "password": "password123"}), headers=headers, content_type='application/json')
+    response = client.post('/users', data=json.dumps({"name": "ravi", "password": "ravi"}), headers=headers, content_type='application/json')
     user_id = response.get_json()['user_id']
     
     # Now get the user
