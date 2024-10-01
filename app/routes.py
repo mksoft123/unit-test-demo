@@ -7,14 +7,9 @@ from jwt import ExpiredSignatureError, InvalidTokenError  # Import specific exce
 from app.config import get_db
 from app.models import UserModel
 
-import os
-
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback_secret_key')  # Use environment variable
 db = get_db()
-
-
 user_model = UserModel(db)
 
 # Token required decorator
@@ -47,19 +42,19 @@ def login():
     if not auth or 'username' not in auth or 'password' not in auth:
         return jsonify({'message': 'Missing credentials!'}), 400
     
+    # Assuming get_user_by_credentials just checks username and password directly
     user = user_model.get_user_by_credentials(auth['username'], auth['password'])
+    
     if user:
-        token = jwt.encode({  # Use jwt.encode here
+        token = jwt.encode({
             'user_id': str(user['_id']),
             'exp': datetime.utcnow() + timedelta(hours=1)
         }, app.config['SECRET_KEY'], algorithm="HS256")
         return jsonify({'token': token}), 200
     return jsonify({'message': 'Invalid credentials!'}), 401
 
-
-
-
 @app.route('/users', methods=['POST'])
+# Uncomment to protect this route if needed
 # @token_required
 def create_user():
     data = request.json
@@ -95,12 +90,12 @@ def delete_user(user_id):
     if result.deleted_count:
         return jsonify({"message": "User deleted"}), 200
     return jsonify({"error": "User not found"}), 404
+
 @app.route('/users', methods=['GET'])
 @token_required  # Optional: protect this endpoint with JWT authentication
 def list_users():
     users = user_model.get_all_users()
     return jsonify(users), 200
-
 
 if __name__ == '__main__':
     app.run(debug=True)  # Set to False in production

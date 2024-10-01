@@ -1,8 +1,4 @@
-# Use the official Python image
-FROM python:3.9-slim
-
-# Set the working directory
-# Use the official Python image
+# Use the official Python 3.10 slim image
 FROM python:3.9-slim
 
 # Set the working directory
