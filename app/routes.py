@@ -9,8 +9,7 @@ from app.models import UserModel
 
 import os
 
-print("Mongo URI:", os.getenv("MONGO_URI"))
-exit()
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback_secret_key')  # Use environment variable
 db = get_db()
