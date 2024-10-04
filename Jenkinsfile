@@ -11,6 +11,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+                    // Build the Docker image
                     sh 'docker build -t my-python-app .'
                 }
             }
@@ -20,7 +21,8 @@ pipeline {
             steps {
                 script {
                     // Run tests within the Docker container
-                    sh 'docker run --rm my-python-app pytest test/test_crud.py'
+                    // Make sure to specify the correct path to your tests
+                    sh 'docker run --rm my-python-app pytest tests/test_crud.py'
                 }
             }
         }
@@ -32,7 +34,7 @@ pipeline {
             steps {
                 script {
                     // Run the application with Docker socket mounted
-                    sh 'docker run -d -p 8089:8080 -v /var/run/docker.sock:/var/run/docker.sock my-python-app'
+                    sh 'docker run -d -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock my-python-app'
                 }
             }
         }
