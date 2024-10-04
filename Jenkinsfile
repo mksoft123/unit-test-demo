@@ -20,11 +20,12 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    // Run tests within the Docker container
-                    sh 'docker run --rm my-python-app pytest -v /app/tests/test_crud.py'
+                    // Run tests within the Docker container with PYTHONPATH set
+                    sh 'docker run --rm -e PYTHONPATH=/app my-python-app pytest -v /app/tests/test_crud.py'
                 }
             }
         }
+
 
 
 
