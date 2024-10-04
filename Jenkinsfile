@@ -21,10 +21,11 @@ pipeline {
             steps {
                 script {
                     // Run tests within the Docker container
-                    sh 'docker run --rm -v $(pwd):/app my-python-app pytest -v /app/tests/test_crud.py'
+                    sh 'docker run --rm my-python-app pytest -v /app/tests/test_crud.py'
                 }
             }
         }
+
 
 
         stage('Deploy') {
