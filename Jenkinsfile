@@ -227,28 +227,28 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    try {
-                        // Run tests within the Docker container with PYTHONPATH set
-                        sh 'docker run --rm --link local-mongo:mongo -e MONGO_URI=mongodb://root:root@mongo:27017/mydb?authSource=admin -e PYTHONPATH=/app my-python-app pytest -v /app/tests/test_crud.py'
-                    } catch (Exception e) {
-                        error "Tests failed: ${e.getMessage()}"
-                    }
+                    // Run tests within the Docker container with PYTHONPATH set
+                    sh 'docker run --rm --link local-mongo:mongo -e MONGO_URI=mongodb://root:root@mongo:27017/mydb?authSource=admin -e PYTHONPATH=/app my-python-app pytest -v /app/tests/test_crud.py'
                 }
             }
         }
 
         stage('Deploy') {
-            when {
-                expression { currentBuild.result == null } // Only deploy if tests passed
-            }
             steps {
                 script {
-                    try {
-                        // Change the port if necessary
-                        sh 'docker run -d -p 8081:8080 -v /var/run/docker.sock:/var/run/docker.sock my-python-app'
-                    } catch (Exception e) {
-                        error "Deployment failed: ${e.getMessage()}"
+                    def containerName = "my-python-app-container"
+
+                    // Check if the container is already running
+                    def running = sh(script: "docker ps -q -f name=${containerName}", returnStdout: true).trim()
+
+                    if (running) {
+                        // Stop and remove the existing container
+                        sh "docker stop ${containerName}"
+                        sh "docker rm ${containerName}"
                     }
+
+                    // Run a new container
+                    sh "docker run -d --name ${containerName} -p 8081:8080 -v /var/run/docker.sock:/var/run/docker.sock my-python-app"
                 }
             }
         }
