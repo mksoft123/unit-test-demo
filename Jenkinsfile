@@ -121,12 +121,12 @@ pipeline {
         failure {
             echo 'Deployment failed!'
         }
-        always {
-            script {
-                // Cleanup any remaining Docker containers
-                sh 'docker ps -a -q | xargs docker rm -f || true'
-            }
-        }
+        // always {
+        //     script {
+        //         // Cleanup any remaining Docker containers
+        //         sh 'docker ps -a -q | xargs docker rm -f || true'
+        //     }
+        // }
     }
 }
 
