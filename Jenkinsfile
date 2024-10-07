@@ -238,22 +238,14 @@ pipeline {
                 script {
                     def containerName = "my-python-app-container"
 
-                    // Check if the container is already running
+                    // Stop and remove the existing container if it exists
                     def running = sh(script: "docker ps -q -f name=${containerName}", returnStdout: true).trim()
-
                     if (running) {
-                        // Force stop and remove the existing container
-                        sh "docker stop -t 0 ${containerName} || true"
-                        sh "docker rm ${containerName} || true"
+                        sh "docker stop ${containerName}"
+                        sh "docker rm ${containerName}"
                     }
 
-                    // Check if the port is still in use
-                    def portInUse = sh(script: "lsof -i :8081", returnStatus: true)
-                    if (portInUse == 0) {
-                        error("Port 8081 is still in use.")
-                    }
-
-                    // Run a new container
+                    // Run a new container with the updated image
                     sh "docker run -d --name ${containerName} -p 8081:8080 -v /var/run/docker.sock:/var/run/docker.sock my-python-app"
                 }
             }
@@ -272,3 +264,4 @@ pipeline {
         }
     }
 }
+
