@@ -242,9 +242,15 @@ pipeline {
                     def running = sh(script: "docker ps -q -f name=${containerName}", returnStdout: true).trim()
 
                     if (running) {
-                        // Stop and remove the existing container
-                        sh "docker stop ${containerName}"
-                        sh "docker rm ${containerName}"
+                        // Force stop and remove the existing container
+                        sh "docker stop -t 0 ${containerName} || true"
+                        sh "docker rm ${containerName} || true"
+                    }
+
+                    // Check if the port is still in use
+                    def portInUse = sh(script: "lsof -i :8081", returnStatus: true)
+                    if (portInUse == 0) {
+                        error("Port 8081 is still in use.")
                     }
 
                     // Run a new container
