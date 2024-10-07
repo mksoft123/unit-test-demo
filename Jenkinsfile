@@ -87,11 +87,12 @@ pipeline {
             }
             steps {
                 script {
-                    // Run the application with Docker socket mounted
-                    sh 'docker run -d -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock my-python-app'
+                    // Change the port if necessary
+                    sh 'docker run -d -p 8081:8080 -v /var/run/docker.sock:/var/run/docker.sock my-python-app'
                 }
             }
         }
+
     }
 
     post {
