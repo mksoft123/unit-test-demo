@@ -76,7 +76,7 @@ pipeline {
             steps {
                 script {
                     // Run tests within the Docker container with PYTHONPATH set
-                    sh 'docker run --rm --link local-mongo:mongo -e MONGO_URI=mongodb://uname:passwd@mongo:27017/mydb?authSource=admin -e PYTHONPATH=/app my-python-app pytest -v /app/tests/test_crud.py'
+                    sh 'docker run --rm --link local-mongo:mongo -e MONGO_URI=mongodb://root:root@mongo:27017/mydb?authSource=admin -e PYTHONPATH=/app my-python-app pytest -v /app/tests/test_crud.py'
                 }
             }
         }
