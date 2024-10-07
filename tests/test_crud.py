@@ -16,7 +16,7 @@ def auth_token(client):
     
     # Now log in to get the token
     login_data = {"username": "ravi444", "password": "ravi"}
-    response = client.post('/login', data=json.dumps(login_data), content_type='application/json')
+    response = client.post('/login1', data=json.dumps(login_data), content_type='application/json')
     token = response.get_json().get('token')
     
     assert token is not None
