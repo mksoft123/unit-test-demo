@@ -10,8 +10,8 @@ def client():
 
 @pytest.fixture
 def auth_token(client):
-    # Create a user directly (no token needed)
-    # user_data = {"name": "TestUser", "password": "testpassword"}
+    # Create a user directly (if needed)
+    # user_data = {"username": "TestUser", "password": "testpassword"}
     # client.post('/users', data=json.dumps(user_data), content_type='application/json')
     
     # Now log in to get the token
@@ -21,7 +21,6 @@ def auth_token(client):
     
     assert token is not None
     return token
-# @pytest.mark.skip(reason="Skipping user creation test temporarily")
 
 def test_create_user(client):
     user_data = {"username": "ravi", "password": "ravi"}
@@ -33,23 +32,23 @@ def test_get_user(auth_token, client):
     headers = {'Authorization': f'Bearer {auth_token}'}
     
     # Create a user to retrieve
-    response = client.post('/users', data=json.dumps({"name": "ravi", "password": "ravi"}), headers=headers, content_type='application/json')
+    response = client.post('/users', data=json.dumps({"username": "Doe", "password": "ravi"}), headers=headers, content_type='application/json')
     user_id = response.get_json()['user_id']
     
     # Now get the user
     response = client.get(f'/users/{user_id}', headers=headers)
     assert response.status_code == 200
-    assert response.get_json()['name'] == 'Doe'
+    assert response.get_json()['username'] == 'Doe'  # Expecting 'Doe' since that's the name we created
 
 def test_update_user(auth_token, client):
     headers = {'Authorization': f'Bearer {auth_token}'}
     
     # First, create a user
-    response = client.post('/users', data=json.dumps({"name": "John", "password": "password123"}), headers=headers, content_type='application/json')
+    response = client.post('/users', data=json.dumps({"username": "John", "password": "password123"}), headers=headers, content_type='application/json')
     user_id = response.get_json()['user_id']
     
     # Update the user
-    response = client.put(f'/users/{user_id}', data=json.dumps({"name": "John Updated"}), headers=headers, content_type='application/json')
+    response = client.put(f'/users/{user_id}', data=json.dumps({"username": "John Updated"}), headers=headers, content_type='application/json')
     assert response.status_code == 200
     assert response.get_json()['message'] == 'User updated'
 
@@ -57,7 +56,7 @@ def test_delete_user(auth_token, client):
     headers = {'Authorization': f'Bearer {auth_token}'}
     
     # First, create a user
-    response = client.post('/users', data=json.dumps({"name": "John", "password": "password123"}), headers=headers, content_type='application/json')
+    response = client.post('/users', data=json.dumps({"username": "John", "password": "password123"}), headers=headers, content_type='application/json')
     user_id = response.get_json()['user_id']
     
     # Delete the user
