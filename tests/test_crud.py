@@ -15,7 +15,7 @@ def auth_token(client):
     # client.post('/users', data=json.dumps(user_data), content_type='application/json')
     
     # Now log in to get the token
-    login_data = {"username": "ravi", "password": "ravi"}
+    login_data = {"username": "pp", "password": "ravi"}
     response = client.post('/login', data=json.dumps(login_data), content_type='application/json')
     token = response.get_json().get('token')
     
