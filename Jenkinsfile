@@ -66,7 +66,7 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image
-                    sh 'docker build -t my-python-app .' 
+                    sh 'docker build -t my-python-app .'
                 }
             }
         }
@@ -116,6 +116,7 @@ pipeline {
         }
     }
 }
+
 
         // Uncomment this block to clean up remaining containers if needed
         // always {
