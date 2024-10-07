@@ -52,7 +52,6 @@
 // //     }
 // // }
 
-
 pipeline {
     agent any
 
@@ -67,7 +66,7 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image
-                    sh 'docker build -t my-python-app .'
+                    sh 'docker build -t my-python-app .' 
                 }
             }
         }
@@ -76,7 +75,11 @@ pipeline {
             steps {
                 script {
                     // Run tests within the Docker container with PYTHONPATH set
-                    sh 'docker run --rm --link local-mongo:mongo -e MONGO_URI=mongodb://root:root@mongo:27017/mydb?authSource=admin -e PYTHONPATH=/app my-python-app pytest -v /app/tests/test_crud.py'
+                    try {
+                        sh 'docker run --rm --link local-mongo:mongo -e MONGO_URI=mongodb://root:root@mongo:27017/mydb?authSource=admin -e PYTHONPATH=/app my-python-app pytest -v /app/tests/test_crud.py'
+                    } catch (Exception e) {
+                        error "Tests failed: ${e.getMessage()}"
+                    }
                 }
             }
         }
@@ -87,12 +90,15 @@ pipeline {
             }
             steps {
                 script {
-                    // Change the port if necessary
-                    sh 'docker run -d -p 8081:8080 -v /var/run/docker.sock:/var/run/docker.sock my-python-app'
+                    try {
+                        // Change the port if necessary
+                        sh 'docker run -d -p 8081:8080 -v /var/run/docker.sock:/var/run/docker.sock my-python-app'
+                    } catch (Exception e) {
+                        error "Deployment failed: ${e.getMessage()}"
+                    }
                 }
             }
         }
-
     }
 
     post {
@@ -100,8 +106,17 @@ pipeline {
             echo 'Deployment successful!'
         }
         failure {
-            echo 'Deployment failed!'
+            echo 'Deployment failed! Check logs for details.'
         }
+        always {
+            script {
+                // Print out relevant logs for debugging if necessary
+                echo "Current build status: ${currentBuild.result}"
+            }
+        }
+    }
+}
+
         // Uncomment this block to clean up remaining containers if needed
         // always {
         //     script {
